@@ -13,32 +13,22 @@
             <span>幸运号码</span>
             <span>奖励</span>
           </div>
-          <div class="table-row" :class="{'selected-row': selected == 1}">
-            <span>0-9885</span>
-            <span>0.0003 EOS</span>
-          </div>
-          <div class="table-row" :class="{'selected-row': selected == 2}">
-            <span>9886-9985</span>
-            <span>0.0030 EOS</span>
-          </div>
-          <div class="table-row" :class="{'selected-row': selected == 3}">
-            <span>9986-9993</span>
-            <span>0.0300 EOS</span>
-          </div>
-          <div class="table-row" :class="{'selected-row': selected == 4}">
-            <span>9994-9997</span>
-            <span>0.3000 EOS</span>
-          </div>
-          <div class="table-row" :class="{'selected-row': selected == 5}">
-            <span>9998-9999</span>
-            <span>3.0000 EOS</span>
-          </div>
-          <div class="table-row-last" :class="{'selected-row': selected == 6}">
-            <span>10000</span>
-            
-                <div class="record1">30.0000 EOS </div>
-                 <div class="record2">大奖记录</div>
-          
+
+          <div
+            class="table-row"
+            v-for="(item, index) in rewardRulers"
+            :key="index"
+            :class="{'selected-row': selected == index+1, 'table-row-last':index==rewardRulers.length-1,
+          }"
+          >
+            <span>
+              {{item.from}}
+              <template v-if="item.from < 10000">-{{item.to}}</template>
+            </span>
+            <span>
+              {{item.award}}
+              <a href="###" v-if="index==rewardRulers.length-1">大奖记录</a>
+            </span>
           </div>
         </div>
 
@@ -86,7 +76,7 @@
 
 
 <script>
-import { ftruncate } from 'fs';
+import { ftruncate } from "fs";
 export default {
   name: "Draw",
   data() {
@@ -96,7 +86,14 @@ export default {
       result: "",
       times: 10,
       reward: "",
-      
+      rewardRulers: [
+        { from: 0, to: 9885, award: "0.0003 EOS" },
+        { from: 9886, to: 9985, award: "0.0030 EOS" },
+        { from: 9986, to: 9993, award: "0.0300 EOS" },
+        { from: 9994, to: 9997, award: "0.3000 EOS" },
+        { from: 9998, to: 9999, award: "3.0000 EOS" },
+        { from: 10000, to: 10000, award: "30.0000 EOS " }
+      ]
     };
   },
   methods: {
@@ -107,8 +104,8 @@ export default {
       }
       this.times--;
       //生成一个随机数，Math.random()表示随机0~1的数
-     var randNum = Math.floor(Math.random() * 10001);
-    
+      var randNum = Math.floor(Math.random() * 10001);
+
       //草稿
       var reward = "";
       if (randNum <= 9885) {
@@ -116,19 +113,19 @@ export default {
         reward = 0.0003;
       } else if (randNum <= 9985) {
         this.selected = 2;
-        reward = 0.0030;
+        reward = 0.003;
       } else if (randNum <= 9993) {
         this.selected = 3;
-        reward = 0.0300;
+        reward = 0.03;
       } else if (randNum <= 9997) {
         this.selected = 4;
-        reward = 0.3000;
+        reward = 0.3;
       } else if (randNum <= 9985) {
         this.selected = 5;
-        reward = 3.00000;
+        reward = 3.0;
       } else if (randNum <= 9999) {
         this.selected = 6;
-        reward = 30.0000;
+        reward = 30.0;
       }
 
       this.result = `本次开奖号码：<span class="red">${randNum}</span>，获得奖励<span class="red">${reward}</span>EOS`;
@@ -178,33 +175,18 @@ export default {
   margin: 0 auto;
 }
 
-//表格设置，幸运号码
+//表格设置，幸运号码，no-repeat背景图只显示一次，不重复。auto(自动/默认)
 .draw-box {
   width: 750px;
   height: 568px;
-  background: url(/images/bg.png) no-repeat;
+  background: url(/images/bg.png) no-repeat; 
   background-size: 100% auto;
   margin: 0 auto;
   padding: 30px;
   box-sizing: border-box;
 }
 
-.draw-lottery {
-  display: block;
-  width: 370px;
-  height: 64px;
-  background: #f3ed39;
-  margin: 30px auto;
-  box-sizing: border-box;
-  border-radius: 8px;
-  color: #000;
-  text-align: center;
-  padding: 20px;
-  font-size: 20px;
-}
-.draw-lottery:hover {
-  background-color: orange;
-}
+
 .draw-table {
   background-color: #fff;
   height: 370px;
@@ -235,17 +217,29 @@ export default {
 }
 //表格最后一行
 
+// .draw-table .table-row-last span {
+//   display: block;
+//   float: left;
+//   width: 50%;
+//   height: 100%;
+//   text-align: center;
+//   line-height: 60px;
+//   box-sizing: border-box; //合模式，高宽算在一起。
+// }
 .draw-table .table-row-last span {
-  display: block;
-  float: left;
-  width: 50%;
-  height: 100%;
-  text-align: center;
   line-height: 60px;
-  box-sizing: border-box; //合模式，高宽算在一起。
+  height: 60px;
 }
-.table-row-last .record{width:50%;height:30px;}
-.table-row-last .record2{color:#f6c85c;height:30px;}
+.draw-table .table-row-last span:last-child {
+  line-height: 20px;
+  padding: 10px 0;
+}
+.draw-table .table-row-last a {
+  display: block;
+  color: #f6c85c;
+  font-size: 12px;
+}
+//设置表格内容位置
 .draw-table .table-row span {
   display: block;
   float: left;
@@ -260,14 +254,31 @@ export default {
 .draw-table .table-head span:first-child {
   border-right: #f3f3f3 1px solid;
 }
-.draw-table .table-row span {
-  border-right: 1px solid #f3f3f3;
-  border-top: 1px solid #f3f3f3;
-}
+// .draw-table .table-row span {
+//   border-right: 1px solid #f3f3f3;
+//   border-top: 1px solid #f3f3f3;
+// }
 
 .draw-table .selected-row {
   border: 1px solid #f6c85c;
   box-shadow: inset 0 0 8px rgba(169, 105, 0, 0.43);
+}
+//开始抽奖
+.draw-lottery {
+  display: block;//	此元素将显示为块级元素
+  width: 370px;
+  height: 64px;
+  background: #f3ed39;
+  margin: 30px auto;
+  box-sizing: border-box;
+  border-radius: 8px;
+  color: #000;
+  text-align: center;
+  padding: 20px;
+  font-size: 20px;
+}
+.draw-lottery:hover {
+  background-color: orange;
 }
 
 //滚动窗口
@@ -331,10 +342,13 @@ export default {
   float: right;
   height: 70px;
   line-height: 70px;
-  margin: 0  ;
+  margin: 0;
   color: #f6c85c;
 }
-.upgrade12 a{margin:0 30px 0 0;float:right}
+.upgrade12 a {
+  margin: 0 30px 0 0;
+  float: right;
+}
 .upgrade22 {
   width: 50%;
   float: left;
@@ -349,7 +363,7 @@ export default {
   width: 112px;
   border-radius: 8px;
   float: right;
-  padding:  0;
+  padding: 0;
   margin: 15px 30px 0 0;
   border: 0px;
 }
